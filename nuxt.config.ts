@@ -8,6 +8,10 @@ export default defineNuxtConfig({
     'nuxt-auth-utils'
   ],
 
+  css: [
+    './assets/css/main.css'
+  ],
+
   runtimeConfig: {
     adminUser: process.env.ADMIN_USER,
     adminPassHash: process.env.ADMIN_PASS_HASH,
