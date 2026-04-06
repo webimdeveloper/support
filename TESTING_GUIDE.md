@@ -9,6 +9,7 @@ Open your Supabase dashboard → **SQL Editor** → Click **+** to create new qu
 **Paste this ONE statement at a time:**
 
 #### Query 1 - Create table:
+
 ```sql
 create table clients (
   id               uuid primary key default gen_random_uuid(),
@@ -21,19 +22,24 @@ create table clients (
   created_at       timestamptz default now()
 );
 ```
+
 ✅ Click **Run** and wait for confirmation
 
 #### Query 2 - Enable RLS:
+
 ```sql
 alter table clients enable row level security;
 ```
+
 ✅ Click **Run**
 
 #### Query 3 - Create policy:
+
 ```sql
 create policy "service_role_only" on clients
   using (auth.role() = 'service_role');
 ```
+
 ✅ Click **Run**
 
 ---
@@ -56,6 +62,7 @@ VALUES (
 ```
 
 This creates a client that can login with:
+
 - **Slug**: `testclient`
 - **Password**: `password123`
 
@@ -72,6 +79,7 @@ npm run dev
 ```
 
 You should see:
+
 ```
 ➜ Local:    http://localhost:3000/
 ```
@@ -159,10 +167,12 @@ If logged in as `webim`:
 ## Troubleshooting
 
 ### Issue: "This site can't be reached"
+
 - Make sure dev server is running: `npm run dev`
 - Check that it says `Local: http://localhost:3000/`
 
 ### Issue: Login doesn't work
+
 1. Check `.env` file has Supabase credentials:
    ```bash
    cat .env | grep SUPABASE
@@ -174,12 +184,15 @@ If logged in as `webim`:
    - Should return the test client row
 
 ### Issue: Build fails
+
 ```bash
 npm run build
 ```
+
 Should complete with `✨ Build complete!`
 
 If it fails, try:
+
 ```bash
 rm -rf .nuxt node_modules package-lock.json
 npm install
@@ -218,7 +231,7 @@ npm run generate
 
 **Login Test Credentials:**
 
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | `webim` | `password123` |
+| Role   | Username     | Password      |
+| ------ | ------------ | ------------- |
+| Admin  | `webim`      | `password123` |
 | Client | `testclient` | `password123` |

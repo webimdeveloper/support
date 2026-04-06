@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { useSupabaseServer } from '~/server/utils/supabase'
+import { useSupabaseServer } from '../../utils/supabase'
 
 const loginAttempts = new Map<string, { count: number; resetTime: number }>()
 
@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check client login in Supabase
-  const supabase = useSupabaseServer()
+  const supabase = useSupabaseServer(event)
 
   const { data: client, error } = await supabase
     .from('clients')
