@@ -38,6 +38,6 @@ jobs:
           script: |
             cd /var/www/support-portal
             git pull origin main
-            npm ci --omit=dev
+            npm ci
             npm run build
             pm2 restart support-portal || pm2 start .output/server/index.mjs --name support-portal
