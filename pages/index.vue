@@ -66,24 +66,25 @@ const handleLogin = async () => {
   isLoading.value = true
   error.value = ''
 
+  let response: any
   try {
-    const response = await $fetch('/api/auth/login', {
+    response = await $fetch('/api/auth/login', {
       method: 'POST',
-      body: form,
+      body: { slug: form.slug, password: form.password },
     })
-
-    // Redirect based on user role from response
-    const userRole = response.user.role
-
-    if (userRole === 'admin') {
-      await router.push('/admin')
-    } else if (userRole === 'client') {
-      await router.push(`/${form.slug}`)
-    }
   } catch (err: any) {
-    error.value = err.data?.statusMessage || 'Invalid credentials. Please try again.'
-  } finally {
+    console.error('Login error:', err)
+    error.value = err.data?.statusMessage || err.message || 'Login failed.'
     isLoading.value = false
+    return
+  }
+
+  isLoading.value = false
+  const userRole = response?.user?.role
+  if (userRole === 'admin') {
+    window.location.href = '/admin'
+  } else if (userRole === 'client') {
+    window.location.href = `/${form.slug}`
   }
 }
 </script>
