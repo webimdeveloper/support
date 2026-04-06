@@ -64,12 +64,87 @@ const slug = route.params.client as string
 const activeTab = ref('CRO')
 const tabs = ['CRO', 'Site Health', 'Assets', 'Reports']
 const clientData = ref<any>(null)
-const pages = ref<any[]>([])
+const pages = ref<any[]>([
+  {
+    id: '1',
+    name: 'Homepage',
+    description: 'Main landing page with hero section',
+    tags: ['Lead gen', 'SEO'],
+    persona: null,
+    croStrategy: 'Focus on CTAs above fold with clear contact form',
+    seoFocus: 'Home, Main Keywords',
+    keywords: 'Service, Solution, Provider',
+    schema: 'Organization',
+    ctas: 'Contact, Learn More',
+  },
+  {
+    id: '2',
+    name: 'Services Page',
+    description: 'Detailed services and offerings',
+    tags: ['Trust', 'SEO'],
+    persona: 'Trust-seeker',
+    croStrategy: 'Add testimonials and social proof',
+    seoFocus: 'Service Pages',
+    keywords: 'Services, Solutions',
+    schema: 'LocalBusiness',
+    ctas: 'Request Demo, Book Consultation',
+  },
+  {
+    id: '3',
+    name: 'Pricing Page',
+    description: 'Pricing plans and options',
+    tags: ['Urgent', 'Lead gen'],
+    persona: 'Price-conscious researcher',
+    croStrategy: 'Simplify pricing tables, add FAQ',
+    seoFocus: 'Pricing',
+    keywords: 'Price, Cost, Plans',
+    schema: 'Product',
+    ctas: 'Get Started, Free Trial',
+  },
+  {
+    id: '4',
+    name: 'Contact Page',
+    description: 'Contact form and support info',
+    tags: ['Support', 'Urgent'],
+    persona: 'Urgent need',
+    croStrategy: 'Multiple contact methods visible',
+    seoFocus: 'Contact',
+    keywords: 'Contact, Support',
+    schema: 'ContactPoint',
+    ctas: 'Send Message, Call Now',
+  },
+  {
+    id: '5',
+    name: 'Blog Main',
+    description: 'Blog listing and featured posts',
+    tags: ['SEO', 'Trust'],
+    persona: null,
+    croStrategy: 'Highlight top articles with CTAs',
+    seoFocus: 'Blog, Content Hub',
+    keywords: 'Blog, Articles, Insights',
+    schema: 'BlogPosting',
+    ctas: 'Read More, Subscribe',
+  },
+  {
+    id: '6',
+    name: 'About Us',
+    description: 'Company information and team',
+    tags: ['Trust'],
+    persona: 'Trust-seeker',
+    croStrategy: 'Highlight credentials and team member bios',
+    seoFocus: 'About Page Brand',
+    keywords: 'About, Team, Company',
+    schema: 'Organization',
+    ctas: 'Learn More, Connect',
+  },
+])
 
 onMounted(async () => {
-  // TODO: Verify session slug matches route param
-  // TODO: Fetch client data from Supabase
-  // TODO: Load CRO data
+  // Load client data
+  clientData.value = {
+    slug: slug,
+    site_name: `${slug.charAt(0).toUpperCase() + slug.slice(1)} Client`,
+  }
 })
 
 const handleLogout = async () => {

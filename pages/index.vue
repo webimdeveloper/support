@@ -76,17 +76,16 @@ const handleLogin = async () => {
       body: form,
     })
 
-    // Redirect based on user role
-    // TODO: Get user role from response
-    const userRole = 'client' // placeholder
+    // Redirect based on user role from response
+    const userRole = response.user.role
 
     if (userRole === 'admin') {
       await router.push('/admin')
-    } else {
+    } else if (userRole === 'client') {
       await router.push(`/${form.slug}`)
     }
   } catch (err: any) {
-    error.value = err.data?.message || 'Invalid credentials. Please try again.'
+    error.value = err.data?.statusMessage || 'Invalid credentials. Please try again.'
   } finally {
     isLoading.value = false
   }
