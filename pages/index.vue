@@ -2,14 +2,13 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
     <div class="w-full max-w-md">
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-        <!-- Logo placeholder -->
+        <!-- Logo -->
         <div class="text-center mb-8">
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">widev.pro Support</h1>
         </div>
 
-        <!-- Login form -->
+        <!-- Login Form -->
         <form @submit.prevent="handleLogin" class="space-y-4">
-          <!-- Slug field -->
           <div>
             <label for="slug" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Site Name / Username
@@ -24,7 +23,6 @@
             />
           </div>
 
-          <!-- Password field -->
           <div>
             <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Password
@@ -38,12 +36,10 @@
             />
           </div>
 
-          <!-- Error message -->
           <div v-if="error" class="text-red-600 dark:text-red-400 text-sm">
             {{ error }}
           </div>
 
-          <!-- Submit button -->
           <button
             type="submit"
             :disabled="isLoading"
