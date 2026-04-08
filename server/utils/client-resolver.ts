@@ -10,7 +10,7 @@ export const resolveClientBySlug = async (event: any, slugParam: string) => {
 
   const direct = await supabase
     .from('clients')
-    .select('id, slug, site_name, gtm_account_id, gtm_container_id, gtm_workspace_id, gtm_audit_data, gtm_ai_analysis, gtm_last_updated')
+    .select('*')
     .eq('slug', slug)
     .maybeSingle()
 
@@ -22,7 +22,7 @@ export const resolveClientBySlug = async (event: any, slugParam: string) => {
   // Fallback for historical slug variants (e.g. dayodental vs dayo-dental)
   const { data: candidates, error } = await supabase
     .from('clients')
-    .select('id, slug, site_name, gtm_account_id, gtm_container_id, gtm_workspace_id, gtm_audit_data, gtm_ai_analysis, gtm_last_updated')
+    .select('*')
     .limit(200)
 
   if (error) {

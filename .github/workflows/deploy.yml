@@ -37,7 +37,8 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /var/www/support-portal
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             npm install
             npm run build
             pm2 startOrRestart /var/www/support-portal/ecosystem.config.cjs --update-env
