@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
+    '@nuxt/ui',
     '@pinia/nuxt',
     'nuxt-auth-utils'
   ],
@@ -22,6 +23,10 @@ export default defineNuxtConfig({
     adminUser: process.env.ADMIN_USER,
     adminPassHash: process.env.ADMIN_PASS_HASH,
     supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    googleClientId: process.env.GOOGLE_CLIENT_ID,
+    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    googleRefreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
     session: {
       password: process.env.NUXT_SESSION_PASSWORD || '',
       cookie: {
