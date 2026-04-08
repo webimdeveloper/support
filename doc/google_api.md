@@ -24,7 +24,7 @@ ANTHROPIC_API_KEY=REPLACE_WITH_NEW_KEY_AFTER_ROTATING
 # These never change regardless of how many clients you add
 # ─────────────────────────────────────────
 GOOGLE_CLIENT_ID=26107969539-8e4u25eirftcoecu725klela3hknjtsp.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-1SWghAYKxXLH0NxZTDQBfjQJABM
+GOOGLE_CLIENT_SECRET=REPLACE_WITH_GOOGLE_CLIENT_SECRET
 
 # Single refresh token covering all 3 Google APIs
 # Represents webim.developer@gmail.com (agency Google account)
