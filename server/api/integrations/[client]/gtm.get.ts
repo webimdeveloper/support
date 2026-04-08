@@ -1,4 +1,5 @@
 import { resolveClientBySlug } from '../../../utils/client-resolver'
+import { ok } from '../../../utils/api-envelope'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -19,15 +20,24 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Client not found' })
   }
 
-  return {
+  const connected = Boolean(data.google_refresh_token_enc || data.google_token_connected_at)
+  return ok({
     configured: Boolean(data.gtm_account_id && data.gtm_container_id && data.gtm_workspace_id),
+    connected,
     ids: isAdmin
       ? {
           accountId: data.gtm_account_id || '',
           containerId: data.gtm_container_id || '',
           workspaceId: data.gtm_workspace_id || '',
+          ga4PropertyId: data.ga4_property_id || '',
+          gscSiteUrl: data.gsc_site_url || '',
         }
       : undefined,
+    services: {
+      gtm: Boolean(data.gtm_account_id && data.gtm_container_id && data.gtm_workspace_id),
+      ga4: Boolean(data.ga4_property_id),
+      gsc: Boolean(data.gsc_site_url),
+    },
     cached: data.gtm_audit_data
       ? {
           summary: (data.gtm_audit_data as any).summary || null,
@@ -37,5 +47,5 @@ export default defineEventHandler(async (event) => {
           updatedAt: data.gtm_last_updated || null,
         }
       : null,
-  }
+  })
 })

@@ -1,91 +1,58 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-    <div class="w-full max-w-md">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-        <!-- Logo -->
-        <div class="text-center mb-8">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">widev.pro Support</h1>
-        </div>
-
-        <!-- Login Form -->
-        <form @submit.prevent="handleLogin" class="space-y-4">
-          <div>
-            <label for="slug" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Site Name / Username
-            </label>
-            <input
-              id="slug"
-              v-model="form.slug"
-              type="text"
-              required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              placeholder="e.g., dayodental"
-            />
-          </div>
-
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Password
-            </label>
-            <input
-              id="password"
-              v-model="form.password"
-              type="password"
-              required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-
-          <div v-if="error" class="text-red-600 dark:text-red-400 text-sm">
-            {{ error }}
-          </div>
-
-          <button
-            type="submit"
-            :disabled="isLoading"
-            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
-          >
-            {{ isLoading ? 'Signing in...' : 'Sign In' }}
-          </button>
-        </form>
+  <div class="min-h-screen bg-white dark:bg-gray-900">
+    <header class="border-b border-gray-200 dark:border-gray-700">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-xl font-semibold" style="color: var(--color-text)">Support Widev Pro</h1>
+        <nav class="flex items-center gap-4 text-sm">
+          <NuxtLink to="/privacy" style="color: var(--color-text-muted)">Privacy</NuxtLink>
+          <NuxtLink to="/terms" style="color: var(--color-text-muted)">Terms</NuxtLink>
+          <NuxtLink to="/contact" style="color: var(--color-text-muted)">Contact</NuxtLink>
+          <NuxtLink to="/about" style="color: var(--color-text-muted)">About</NuxtLink>
+          <NuxtLink to="/login" class="px-3 py-1.5 rounded-md text-white bg-blue-600 hover:bg-blue-700">Sign in</NuxtLink>
+        </nav>
       </div>
-    </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12 space-y-12">
+      <section class="space-y-4">
+        <h2 class="text-4xl font-bold" style="color: var(--color-text)">Automated CRO audits for your clients</h2>
+        <p class="text-lg max-w-3xl" style="color: var(--color-text-muted)">
+          Connect Google Tag Manager, Analytics, and Search Console. Get instant audits and AI-powered recommendations.
+        </p>
+        <NuxtLink to="/login" class="inline-block px-5 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700">Sign in</NuxtLink>
+      </section>
+
+      <section class="grid md:grid-cols-3 gap-4">
+        <div class="rounded-lg border p-4" style="border-color: var(--border-default)">
+          <h3 class="font-semibold" style="color: var(--color-text)">1. Connect</h3>
+          <p class="text-sm mt-1" style="color: var(--color-text-muted)">Client connects Google account with one click.</p>
+        </div>
+        <div class="rounded-lg border p-4" style="border-color: var(--border-default)">
+          <h3 class="font-semibold" style="color: var(--color-text)">2. Analyze</h3>
+          <p class="text-sm mt-1" style="color: var(--color-text-muted)">Portal reads GTM config, GA4 metrics, and Search Console data.</p>
+        </div>
+        <div class="rounded-lg border p-4" style="border-color: var(--border-default)">
+          <h3 class="font-semibold" style="color: var(--color-text)">3. Report</h3>
+          <p class="text-sm mt-1" style="color: var(--color-text-muted)">AI generates prioritized CRO recommendations instantly.</p>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h3 class="text-2xl font-semibold" style="color: var(--color-text)">What data we access</h3>
+        <p class="text-sm" style="color: var(--color-text-muted)"><strong>Google Tag Manager (read-only):</strong> Tags, triggers, and variables for auditing setup. We never modify or publish.</p>
+        <p class="text-sm" style="color: var(--color-text-muted)"><strong>Google Analytics 4 (read-only):</strong> Aggregated page-level metrics for CRO insights. No personal identifiers.</p>
+        <p class="text-sm" style="color: var(--color-text-muted)"><strong>Google Search Console (read-only):</strong> Clicks, impressions, CTR, and position per page/query.</p>
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
-const router = useRouter()
-const form = reactive({
-  slug: '',
-  password: '',
+useSeoMeta({
+  title: 'Support Widev Pro - CRO Portal',
+  description: 'Automated CRO audits for agencies and clients with GTM, GA4, and Search Console insights.',
+  ogTitle: 'Support Widev Pro - CRO Portal',
+  ogDescription: 'Connect GTM, GA4 and Search Console for AI-powered CRO insights.',
+  ogUrl: 'https://support.widev.pro',
 })
-const isLoading = ref(false)
-const error = ref('')
-
-const handleLogin = async () => {
-  isLoading.value = true
-  error.value = ''
-
-  let response: any
-  try {
-    response = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: { slug: form.slug, password: form.password },
-    })
-  } catch (err: any) {
-    console.error('Login error:', err)
-    error.value = err.data?.statusMessage || err.message || 'Login failed.'
-    isLoading.value = false
-    return
-  }
-
-  isLoading.value = false
-  const userRole = response?.user?.role
-  if (userRole === 'admin') {
-    window.location.href = '/admin'
-  } else if (userRole === 'client') {
-    const projectSlug = response?.user?.projectSlug || form.slug
-    window.location.href = `/${form.slug}/${projectSlug}`
-  }
-}
 </script>

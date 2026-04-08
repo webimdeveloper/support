@@ -159,7 +159,7 @@ const handleProjectClick = async (event: MouseEvent, client: ClientRow) => {
 
 const handleLogout = async () => {
   await $fetch('/api/auth/logout', { method: 'POST' })
-  await router.push('/')
+  await router.push('/login')
 }
 
 onMounted(async () => {

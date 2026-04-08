@@ -21,8 +21,11 @@ type GTMTrigger = {
 
 type GTMVariable = { name?: string; type?: string }
 
-export const fetchGTMContainer = async (event: any, payload: { accountId: string; containerId: string; workspaceId: string }) => {
-  const accessToken = await getGoogleAccessToken(event)
+export const fetchGTMContainer = async (
+  event: any,
+  payload: { accountId: string; containerId: string; workspaceId: string; refreshToken?: string }
+) => {
+  const accessToken = await getGoogleAccessToken(event, payload.refreshToken)
   const headers = { Authorization: `Bearer ${accessToken}` }
   const base = `https://www.googleapis.com/tagmanager/v2/accounts/${payload.accountId}/containers/${payload.containerId}/workspaces/${payload.workspaceId}`
 

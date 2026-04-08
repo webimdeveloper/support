@@ -42,63 +42,28 @@
         />
         <p v-if="saveMessage" class="text-sm text-green-600">{{ saveMessage }}</p>
       </div>
-      <div v-else-if="activeTab === 'Site Health'" class="space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">GTM Insights</h2>
-          <UiButton v-if="isAdmin" :disabled="gtmLoading" @click="refreshGtmInsights">
-            {{ gtmLoading ? 'Updating...' : 'Update GTM Data' }}
-          </UiButton>
-        </div>
-
-        <div
-          v-if="!gtmConfigured && !gtmError"
-          class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200"
-        >
-          GTM is not configured for this client yet. Add GTM account/container/workspace IDs to the client record first.
-        </div>
-
-        <div v-else-if="gtmSummary" class="grid gap-3 md:grid-cols-4">
-          <div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-            <p class="text-xs text-gray-500">Total tags</p>
-            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ gtmSummary.totalTags }}</p>
-          </div>
-          <div class="rounded-lg border p-4" :class="gtmSummary.pausedTags > 0 ? 'border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30' : 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950/30'">
-            <p class="text-xs text-gray-500">Paused tags</p>
-            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ gtmSummary.pausedTags }}</p>
-          </div>
-          <div class="rounded-lg border p-4" :class="gtmSummary.conversionTriggers > 0 ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950/30' : 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-950/30'">
-            <p class="text-xs text-gray-500">Conversion triggers</p>
-            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ gtmSummary.conversionTriggers }}</p>
-          </div>
-          <div
-            class="rounded-lg border p-4"
-            :class="gtmSummary.variablesDefined >= 5 ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950/30' : gtmSummary.variablesDefined >= 3 ? 'border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30' : 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-950/30'"
-          >
-            <p class="text-xs text-gray-500">Variables defined</p>
-            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ gtmSummary.variablesDefined }}</p>
-          </div>
-        </div>
-
-        <div v-if="gtmFlags.length" class="space-y-2">
-          <div
-            v-for="(flag, idx) in gtmFlags"
-            :key="`${flag.title}-${idx}`"
-            class="rounded-lg border-l-4 bg-white p-3 dark:bg-gray-900"
-            :class="flagSeverityClass(flag.severity)"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <p class="font-medium text-sm text-gray-900 dark:text-white">{{ flag.title }}</p>
-              <span class="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded" :class="flagBadgeClass(flag.severity)">
-                {{ flag.severity }}
-              </span>
-            </div>
-            <p class="mt-1 text-xs text-gray-600 dark:text-gray-300">{{ flag.desc }}</p>
-          </div>
-        </div>
-
-        <p v-if="gtmUpdatedAt" class="text-xs text-gray-500">Last updated: {{ gtmUpdatedAt }}</p>
-        <p v-if="gtmError" class="text-sm text-red-600">{{ gtmError }}</p>
-      </div>
+      <SiteHealthPanel
+        v-else-if="activeTab === 'Site Health'"
+        :is-admin="isAdmin"
+        :loading="gtm.loading.value"
+        :connecting="gtm.connecting.value"
+        :mapping-saving="gtm.mappingSaving.value"
+        :configured="gtm.configured.value"
+        :connected="gtm.connected.value"
+        :summary="gtm.summary.value"
+        :services="gtm.services.value"
+        :ids="gtm.ids.value"
+        :filtered-flags="gtm.filteredFlags.value"
+        :active-severity="gtm.activeSeverity.value"
+        :counts="gtm.severityCounts.value"
+        :updated-at="gtm.updatedAt.value"
+        :error="gtm.error.value"
+        @refresh="gtm.refresh"
+        @connect="gtm.connect('all')"
+        @disconnect="gtm.disconnect"
+        @save-mapping="(value) => { gtm.ids.value = value; gtm.saveMapping() }"
+        @filter="gtm.setSeverityFilter"
+      />
       <div v-else class="text-center py-12">
         <p class="text-gray-500 dark:text-gray-400 text-lg">{{ activeTab }} tab - Coming soon</p>
       </div>
@@ -132,9 +97,6 @@ type Page = {
   cta: string
 }
 type DashboardPayload = { pageTypes: PageType[]; userTypes: UserType[]; funnelStages: FunnelStage[]; pages: Page[] }
-type GTMSummary = { totalTags: number; pausedTags: number; conversionTriggers: number; variablesDefined: number }
-type GTMFlag = { severity: 'critical' | 'warning' | 'ok' | 'info'; title: string; desc: string }
-
 definePageMeta({
   middleware: 'auth',
 })
@@ -148,12 +110,6 @@ const tabs = ['CRO', 'Site Health', 'Assets', 'Reports']
 const isAdmin = ref(false)
 const loadError = ref('')
 const saveMessage = ref('')
-const gtmConfigured = ref(false)
-const gtmSummary = ref<GTMSummary | null>(null)
-const gtmFlags = ref<GTMFlag[]>([])
-const gtmUpdatedAt = ref<string>('')
-const gtmError = ref('')
-const gtmLoading = ref(false)
 const dashboard = reactive<DashboardPayload>({
   pageTypes: [],
   userTypes: [],
@@ -167,7 +123,7 @@ const goBackToAdmin = async () => {
 
 const handleLogout = async () => {
   await $fetch('/api/auth/logout', { method: 'POST' })
-  await router.push('/')
+  await router.push('/login')
 }
 
 const loadDashboard = async () => {
@@ -177,7 +133,7 @@ const loadDashboard = async () => {
     isAdmin.value = (session as any)?.user?.role === 'admin'
 
     if (!isAdmin.value && (session as any)?.user?.slug !== clientSlug.value) {
-      await router.push('/')
+      await router.push('/login')
       return
     }
 
@@ -201,53 +157,7 @@ const loadDashboard = async () => {
   }
 }
 
-const loadGtmInsights = async () => {
-  gtmError.value = ''
-  try {
-    const response = await $fetch(`/api/integrations/${clientSlug.value}/gtm`)
-    const payload = response as any
-    gtmConfigured.value = Boolean(payload?.configured)
-    gtmSummary.value = payload?.cached?.summary || null
-    gtmFlags.value = payload?.cached?.flags || []
-    gtmUpdatedAt.value = payload?.cached?.updatedAt || ''
-  } catch (error: any) {
-    gtmError.value = error?.data?.statusMessage || 'Failed to load GTM insights'
-  }
-}
-
-const refreshGtmInsights = async () => {
-  if (!isAdmin.value) return
-  gtmLoading.value = true
-  gtmError.value = ''
-  try {
-    const response = await $fetch(`/api/integrations/${clientSlug.value}/gtm.refresh`, {
-      method: 'POST',
-    })
-    const payload = response as any
-    gtmConfigured.value = true
-    gtmSummary.value = payload?.summary || null
-    gtmFlags.value = payload?.flags || []
-    gtmUpdatedAt.value = payload?.updatedAt || ''
-  } catch (error: any) {
-    gtmError.value = error?.data?.statusMessage || 'Failed to update GTM insights'
-  } finally {
-    gtmLoading.value = false
-  }
-}
-
-const flagSeverityClass = (severity: GTMFlag['severity']) => {
-  if (severity === 'critical') return 'border-red-500'
-  if (severity === 'warning') return 'border-amber-400'
-  if (severity === 'ok') return 'border-green-500'
-  return 'border-blue-400'
-}
-
-const flagBadgeClass = (severity: GTMFlag['severity']) => {
-  if (severity === 'critical') return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-  if (severity === 'warning') return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
-  if (severity === 'ok') return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-  return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-}
+const gtm = useGtmInsights(clientSlug, isAdmin)
 
 const saveDashboard = async (payload: DashboardPayload) => {
   if (!isAdmin.value) return
@@ -265,6 +175,6 @@ const saveDashboard = async (payload: DashboardPayload) => {
 
 onMounted(async () => {
   await loadDashboard()
-  await loadGtmInsights()
+  await gtm.load()
 })
 </script>

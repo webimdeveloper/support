@@ -1,6 +1,8 @@
 import { useSupabaseServer } from '../../../utils/supabase'
 import { analyzeGTMContainer, fetchGTMContainer } from '../../../utils/gtm-audit'
 import { resolveClientBySlug } from '../../../utils/client-resolver'
+import { ok } from '../../../utils/api-envelope'
+import { decryptToken } from '../../../utils/token-crypto'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -26,7 +28,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { tags, triggers, variables } = await fetchGTMContainer(event, { accountId, containerId, workspaceId })
+  const refreshToken = clientRow.google_refresh_token_enc
+    ? decryptToken(event, String(clientRow.google_refresh_token_enc))
+    : undefined
+  const { tags, triggers, variables } = await fetchGTMContainer(event, { accountId, containerId, workspaceId, refreshToken })
   const audit = analyzeGTMContainer(tags, triggers, variables)
   const updatedAt = new Date().toISOString()
 
@@ -42,11 +47,20 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: 'Failed to cache GTM audit result' })
   }
 
-  return {
-    connected: true,
-    summary: audit.summary,
-    flags: audit.flags,
-    rawData: audit.rawData,
-    updatedAt,
-  }
+  return ok({
+    configured: true,
+    connected: Boolean(clientRow.google_refresh_token_enc || clientRow.google_token_connected_at),
+    cached: {
+      summary: audit.summary,
+      flags: audit.flags,
+      rawData: audit.rawData,
+      aiAnalysis: clientRow.gtm_ai_analysis || '',
+      updatedAt,
+    },
+    services: {
+      gtm: true,
+      ga4: Boolean(clientRow.ga4_property_id),
+      gsc: Boolean(clientRow.gsc_site_url),
+    },
+  })
 })

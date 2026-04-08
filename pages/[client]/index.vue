@@ -23,6 +23,6 @@ await router.replace(`/${slug}/${projectSlug}`)
 
 const handleLogout = async () => {
   await $fetch('/api/auth/logout', { method: 'POST' })
-  await router.push('/')
+  await router.push('/login')
 }
 </script>

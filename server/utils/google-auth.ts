@@ -1,7 +1,8 @@
-export const getGoogleAccessToken = async (event: any) => {
+export const getGoogleAccessToken = async (event: any, refreshTokenOverride?: string) => {
   const config = useRuntimeConfig(event)
+  const refreshToken = refreshTokenOverride || String(config.googleRefreshToken || '')
 
-  if (!config.googleClientId || !config.googleClientSecret || !config.googleRefreshToken) {
+  if (!config.googleClientId || !config.googleClientSecret || !refreshToken) {
     throw createError({
       statusCode: 500,
       statusMessage: 'Google API credentials are not configured',
@@ -14,7 +15,7 @@ export const getGoogleAccessToken = async (event: any) => {
     body: new URLSearchParams({
       client_id: String(config.googleClientId),
       client_secret: String(config.googleClientSecret),
-      refresh_token: String(config.googleRefreshToken),
+      refresh_token: refreshToken,
       grant_type: 'refresh_token',
     }),
   })

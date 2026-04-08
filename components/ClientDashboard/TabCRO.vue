@@ -15,12 +15,14 @@
           @dragend.prevent
           @click="onSegmentChipClick($event, item.id)"
         >
-          <button
-            type="button"
+          <span
+            role="button"
+            tabindex="0"
             class="color-edit-trigger w-3 h-3 rounded-full flex-shrink-0 transition-transform hover:scale-125 focus:outline-none focus:ring-2 focus:ring-blue-400"
             :style="{ backgroundColor: item.color }"
             :title="`Change color for ${item.label}`"
             @click.stop="openColorPicker($event, 'segment', item.id)"
+            @keydown.enter.prevent.stop="openColorPicker($event as any, 'segment', item.id)"
           />
           <span v-if="editingLegend?.kind === 'segment' && editingLegend?.id === item.id" class="w-full">
             <input
@@ -57,12 +59,14 @@
           @dragend.prevent
           @click="onUserTypeChipClick($event, item.id)"
         >
-          <button
-            type="button"
+          <span
+            role="button"
+            tabindex="0"
             class="color-edit-trigger w-3 h-3 rounded-full flex-shrink-0 transition-transform hover:scale-125 focus:outline-none focus:ring-2 focus:ring-blue-400"
             :style="{ backgroundColor: item.color }"
             :title="`Change color for ${item.label}`"
             @click.stop="openColorPicker($event, 'user', item.id)"
+            @keydown.enter.prevent.stop="openColorPicker($event as any, 'user', item.id)"
           />
           <span v-if="editingLegend?.kind === 'user' && editingLegend?.id === item.id" class="w-full">
             <input
@@ -99,12 +103,14 @@
           @dragend.prevent
           @click="onFunnelChipClick($event, item.id)"
         >
-          <button
-            type="button"
+          <span
+            role="button"
+            tabindex="0"
             class="color-edit-trigger w-3 h-3 rounded-full flex-shrink-0 transition-transform hover:scale-125 focus:outline-none focus:ring-2 focus:ring-blue-400"
             :style="{ backgroundColor: item.color }"
             :title="`Change color for ${item.label}`"
             @click.stop="openColorPicker($event, 'funnel', item.id)"
+            @keydown.enter.prevent.stop="openColorPicker($event as any, 'funnel', item.id)"
           />
           <span v-if="editingLegend?.kind === 'funnel' && editingLegend?.id === item.id" class="w-full">
             <input
