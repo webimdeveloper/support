@@ -1,15 +1,16 @@
 # support.widev.pro — Client Support Portal
+
 ### AI Agent Technical Task
 
-| | |
-|---|---|
-| **Project** | widev.pro Support Portal |
-| **Domain** | support.widev.pro |
-| **Stack** | Nuxt 3, Vue 3, Supabase, shadcn-vue, Tailwind CSS |
-| **Auth** | nuxt-auth-utils + Supabase (server-side sessions) |
-| **Hosting** | Hostinger VPS + Nginx + PM2 |
-| **CI/CD** | GitHub Actions → SSH deploy to Hostinger VPS |
-| **Document version** | v1.1 — April 2026 |
+|                      |                                                   |
+| -------------------- | ------------------------------------------------- |
+| **Project**          | Support Portal Widev                              |
+| **Domain**           | support.widev.pro                                 |
+| **Stack**            | Nuxt 3, Vue 3, Supabase, shadcn-vue, Tailwind CSS |
+| **Auth**             | nuxt-auth-utils + Supabase (server-side sessions) |
+| **Hosting**          | Hostinger VPS, AlmaLinux 9                        |
+| **CI/CD**            | GitHub Actions → SSH deploy to Hostinger VPS      |
+| **Document version** | v1.1 — April 2026                                 |
 
 ---
 
@@ -37,35 +38,37 @@ git push -u origin main
 
 ### 2.2 Branch strategy
 
-| Branch | Purpose |
-|---|---|
-| `main` | Production — auto-deploys via GitHub Actions |
-| `dev` | Active development branch — merge PRs here first |
-| `feature/*` | Individual features, e.g. `feature/auth-flow` |
+| Branch      | Purpose                                          |
+| ----------- | ------------------------------------------------ |
+| `main`      | Production — auto-deploys via GitHub Actions     |
+| `dev`       | Active development branch — merge PRs here first |
+| `feature/*` | Individual features, e.g. `feature/auth-flow`    |
 
 ### 2.3 GitHub Secrets to configure
 
 Go to **GitHub repo → Settings → Secrets and variables → Actions**. Add the following secrets:
 
-| Secret name | Value / source |
-|---|---|
-| `VPS_HOST` | Your Hostinger VPS IP address |
-| `VPS_USER` | Your VPS SSH user (usually `root`) |
-| `VPS_SSH_KEY` | Your private SSH key — see Section 9.3 for generation |
-| `VPS_PORT` | `22` (default SSH port) |
-| `NUXT_SESSION_PASSWORD` | 64-char random hex string (see generation command below) |
-| `ADMIN_USER` | Your admin username, e.g. `webim` |
-| `ADMIN_PASS_HASH` | bcrypt hash of your admin password (cost 12) |
-| `SUPABASE_URL` | From Supabase project → Settings → API |
-| `SUPABASE_ANON_KEY` | From Supabase project → Settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | From Supabase project → Settings → API (keep private) |
+| Secret name                 | Value / source                                           |
+| --------------------------- | -------------------------------------------------------- |
+| `VPS_HOST`                  | Your Hostinger VPS IP address                            |
+| `VPS_USER`                  | Your VPS SSH user (usually `root`)                       |
+| `VPS_SSH_KEY`               | Your private SSH key — see Section 9.3 for generation    |
+| `VPS_PORT`                  | `22` (default SSH port)                                  |
+| `NUXT_SESSION_PASSWORD`     | 64-char random hex string (see generation command below) |
+| `ADMIN_USER`                | Your admin username, e.g. `webim`                        |
+| `ADMIN_PASS_HASH`           | bcrypt hash of your admin password (cost 12)             |
+| `SUPABASE_URL`              | From Supabase project → Settings → API                   |
+| `SUPABASE_ANON_KEY`         | From Supabase project → Settings → API                   |
+| `SUPABASE_SERVICE_ROLE_KEY` | From Supabase project → Settings → API (keep private)    |
 
 > **Generate session password:**
+>
 > ```bash
 > node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 > ```
 
 > **Generate bcrypt hash for admin password:**
+>
 > ```bash
 > node -e "require('bcrypt').hash('yourpassword', 12).then(console.log)"
 > ```
@@ -221,10 +224,12 @@ The login endpoint must handle both admin and client login from a single form:
 ### 6.3 Middleware
 
 **`middleware/auth.ts`**
+
 - Runs on all routes except `/`
 - If no session exists, redirect to `/`
 
 **`middleware/admin.ts`**
+
 - Runs only on `/admin/**`
 - If `session.user.role !== 'admin'`, redirect to `/`
 
@@ -249,19 +254,19 @@ After login, the client sees their dashboard at `/dayodental` (their slug). The 
 
 The CRO tab is the primary deliverable of Phase 1. It must faithfully replicate the design and interactions from the reference file `client_page_example.html`, adapted as a Vue 3 component with the portal's design system.
 
-| Feature | Implementation detail |
-|---|---|
-| Page cards grid | CSS grid, `auto-fill`, `minmax(195px, 1fr)`, same as reference |
-| Card click to expand | Vue reactive `selectedId` ref — selected card gets `info-border` highlight |
-| Detail panel | Appears below the grid, same fields: CRO strategy, SEO focus, Keywords, Schema, CTAs |
-| Persona filter buttons | All pages / Price-conscious researcher / Trust-seeker / Urgent need |
-| Color legend | Top of tab — dot + label pairs matching reference color scheme |
-| Tag colors | Match reference exactly: Lead gen `#1D9E75`, Trust `#534AB7`, SEO `#EF9F27`, Urgent `#D85A30`, Support `#185FA5` |
-| Dark mode | Full support via CSS variables, matching reference `prefers-color-scheme` logic |
-| Smooth scroll | Detail panel `scrollIntoView` on open, same as reference |
-| Close detail | Click selected card again or click 'Close detail' button |
-| Data source | Phase 1: static JSON prop passed from parent page. Phase 2: from Supabase |
-| Mobile responsive | `detail-grid` collapses to 1 column below 580px, same as reference |
+| Feature                | Implementation detail                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Page cards grid        | CSS grid, `auto-fill`, `minmax(195px, 1fr)`, same as reference                                                   |
+| Card click to expand   | Vue reactive `selectedId` ref — selected card gets `info-border` highlight                                       |
+| Detail panel           | Appears below the grid, same fields: CRO strategy, SEO focus, Keywords, Schema, CTAs                             |
+| Persona filter buttons | All pages / Price-conscious researcher / Trust-seeker / Urgent need                                              |
+| Color legend           | Top of tab — dot + label pairs matching reference color scheme                                                   |
+| Tag colors             | Match reference exactly: Lead gen `#1D9E75`, Trust `#534AB7`, SEO `#EF9F27`, Urgent `#D85A30`, Support `#185FA5` |
+| Dark mode              | Full support via CSS variables, matching reference `prefers-color-scheme` logic                                  |
+| Smooth scroll          | Detail panel `scrollIntoView` on open, same as reference                                                         |
+| Close detail           | Click selected card again or click 'Close detail' button                                                         |
+| Data source            | Phase 1: static JSON prop passed from parent page. Phase 2: from Supabase                                        |
+| Mobile responsive      | `detail-grid` collapses to 1 column below 580px, same as reference                                               |
 
 > ℹ The page data (`PAGES` array) must be a **prop** so it can later be replaced with a Supabase fetch without changing the component.
 
@@ -269,17 +274,17 @@ The CRO tab is the primary deliverable of Phase 1. It must faithfully replicate 
 
 Define these CSS variables in the global stylesheet, matching the reference file exactly:
 
-| Variable | Light value | Dark value |
-|---|---|---|
-| `--bg` | `#ffffff` | `#1c1c1a` |
-| `--bg2` | `#f7f7f5` | `#252523` |
-| `--bg3` | `#eeede9` | `#2e2e2b` |
-| `--text` | `#1a1a18` | `#e8e6de` |
-| `--text2` | `#5c5b57` | `#a8a69e` |
-| `--text3` | `#9c9a92` | `#6e6c66` |
-| `--info-bg` | `#e6f1fb` | `#0c2e52` |
-| `--info-border` | `#185FA5` | `#85B7EB` |
-| `--info-text` | `#185FA5` | `#85B7EB` |
+| Variable        | Light value | Dark value |
+| --------------- | ----------- | ---------- |
+| `--bg`          | `#ffffff`   | `#1c1c1a`  |
+| `--bg2`         | `#f7f7f5`   | `#252523`  |
+| `--bg3`         | `#eeede9`   | `#2e2e2b`  |
+| `--text`        | `#1a1a18`   | `#e8e6de`  |
+| `--text2`       | `#5c5b57`   | `#a8a69e`  |
+| `--text3`       | `#9c9a92`   | `#6e6c66`  |
+| `--info-bg`     | `#e6f1fb`   | `#0c2e52`  |
+| `--info-border` | `#185FA5`   | `#85B7EB`  |
+| `--info-text`   | `#185FA5`   | `#85B7EB`  |
 
 ---
 
@@ -461,9 +466,9 @@ Certbot auto-renews. No further config needed.
 
 In your Hostinger DNS panel, add an **A record**:
 
-| Type | Name | Value |
-|---|---|---|
-| A | `support` | Your VPS IP address |
+| Type | Name      | Value               |
+| ---- | --------- | ------------------- |
+| A    | `support` | Your VPS IP address |
 
 Allow up to 24h for propagation. Verify with:
 
@@ -511,13 +516,13 @@ Create `.env` locally and on the VPS with real values. Ensure `.gitignore` inclu
 
 Build in this exact order. Do not skip phases.
 
-| Phase | Scope | Done when |
-|---|---|---|
-| **1 — Foundation** | Repo, CI/CD, deploy pipeline | Green GitHub Action, app loads on VPS URL |
-| **2 — Auth** | Login page, session, middleware, logout | Admin and client can log in, routes protected |
-| **3 — Admin** | Client CRUD, Supabase, copy credentials | Admin can create/edit/delete clients |
-| **4 — Dashboard** | Client page, tab shell, CRO tab | Client sees read-only CRO tab after login |
-| **5 — DNS & HTTPS** | Custom domain, Nginx, Let's Encrypt, final checks | `support.widev.pro` live, HTTPS enforced |
+| Phase               | Scope                                             | Done when                                     |
+| ------------------- | ------------------------------------------------- | --------------------------------------------- |
+| **1 — Foundation**  | Repo, CI/CD, deploy pipeline                      | Green GitHub Action, app loads on VPS URL     |
+| **2 — Auth**        | Login page, session, middleware, logout           | Admin and client can log in, routes protected |
+| **3 — Admin**       | Client CRUD, Supabase, copy credentials           | Admin can create/edit/delete clients          |
+| **4 — Dashboard**   | Client page, tab shell, CRO tab                   | Client sees read-only CRO tab after login     |
+| **5 — DNS & HTTPS** | Custom domain, Nginx, Let's Encrypt, final checks | `support.widev.pro` live, HTTPS enforced      |
 
 ---
 
@@ -525,18 +530,18 @@ Build in this exact order. Do not skip phases.
 
 Before going live, verify all of these:
 
-| Check | How to verify |
-|---|---|
-| Passwords hashed with bcrypt cost 12 | Check Supabase DB — `pass_hash` starts with `$2b$12$` |
-| No plain passwords in logs or responses | Check server logs after login attempt |
-| Session cookie is httpOnly and secure | Inspect browser DevTools → Application → Cookies |
-| Admin routes return 403 for client sessions | Log in as client, manually visit `/admin` — must redirect |
-| Client cannot view another client's page | Log in as `clientA`, visit `/clientB` — must redirect |
-| Rate limiting active on `/api/auth/login` | 10+ rapid requests should return 429 |
-| `SUPABASE_SERVICE_ROLE_KEY` never in public runtimeConfig | Check `nuxt.config.ts` — must be in private config only |
-| HTTPS enforced on production domain | Visit `http://support.widev.pro` — must redirect to `https` |
-| `.env` not committed to repository | Run: `git log --all -- .env` — must return nothing |
-| PM2 restarts on VPS reboot | Run `sudo reboot`, SSH back in, check `pm2 list` |
+| Check                                                     | How to verify                                               |
+| --------------------------------------------------------- | ----------------------------------------------------------- |
+| Passwords hashed with bcrypt cost 12                      | Check Supabase DB — `pass_hash` starts with `$2b$12$`       |
+| No plain passwords in logs or responses                   | Check server logs after login attempt                       |
+| Session cookie is httpOnly and secure                     | Inspect browser DevTools → Application → Cookies            |
+| Admin routes return 403 for client sessions               | Log in as client, manually visit `/admin` — must redirect   |
+| Client cannot view another client's page                  | Log in as `clientA`, visit `/clientB` — must redirect       |
+| Rate limiting active on `/api/auth/login`                 | 10+ rapid requests should return 429                        |
+| `SUPABASE_SERVICE_ROLE_KEY` never in public runtimeConfig | Check `nuxt.config.ts` — must be in private config only     |
+| HTTPS enforced on production domain                       | Visit `http://support.widev.pro` — must redirect to `https` |
+| `.env` not committed to repository                        | Run: `git log --all -- .env` — must return nothing          |
+| PM2 restarts on VPS reboot                                | Run `sudo reboot`, SSH back in, check `pm2 list`            |
 
 ---
 
@@ -556,4 +561,4 @@ When using this document with Claude Code in VS Code or Cursor, follow these rul
 
 ---
 
-*— End of Technical Task v1.1 —*
+_— End of Technical Task v1.1 —_

@@ -84,7 +84,8 @@ const handleLogin = async () => {
   if (userRole === 'admin') {
     window.location.href = '/admin'
   } else if (userRole === 'client') {
-    window.location.href = `/${form.slug}`
+    const projectSlug = response?.user?.projectSlug || form.slug
+    window.location.href = `/${form.slug}/${projectSlug}`
   }
 }
 </script>

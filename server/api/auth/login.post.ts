@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import { useSupabaseServer } from '../../utils/supabase'
+import { getProjectSlugFromUrl } from '../../utils/project'
 
 const loginAttempts = new Map<string, { count: number; resetTime: number }>()
 
@@ -64,7 +65,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: client, error } = await supabase
     .from('clients')
-    .select('id, slug, pass_hash, active')
+    .select('id, slug, pass_hash, active, site_url')
     .eq('slug', slug)
     .single()
 
@@ -106,6 +107,7 @@ export default defineEventHandler(async (event) => {
       id: client.id,
       slug: client.slug,
       role: 'client',
+      projectSlug: getProjectSlugFromUrl(client.site_url || client.slug),
     },
   }
 })

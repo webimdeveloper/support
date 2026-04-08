@@ -1,0 +1,8 @@
+export { default as UiBadge } from './UiBadge.vue'
+export { default as UiButton } from './UiButton.vue'
+export { default as UiCheckbox } from './UiCheckbox.vue'
+export { default as UiInput } from './UiInput.vue'
+export { default as UiLink } from './UiLink.vue'
+export { default as UiModal } from './UiModal.vue'
+export { default as UiSelect } from './UiSelect.vue'
+export { default as UiTable } from './UiTable.vue'
