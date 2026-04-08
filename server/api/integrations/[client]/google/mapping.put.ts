@@ -1,6 +1,6 @@
-import { useSupabaseServer } from '../../../../../utils/supabase'
-import { resolveClientBySlug } from '../../../../../utils/client-resolver'
-import { ok } from '../../../../../utils/api-envelope'
+import { useSupabaseServer } from '../../../../utils/supabase'
+import { resolveClientBySlug } from '../../../../utils/client-resolver'
+import { ok } from '../../../../utils/api-envelope'
 
 type MappingBody = {
   gtmAccountId?: string

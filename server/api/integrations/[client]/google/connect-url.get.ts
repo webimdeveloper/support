@@ -1,6 +1,6 @@
-import { ok } from '../../../../../utils/api-envelope'
-import { buildSignedState, getScopesForService } from '../../../../../utils/google-oauth'
-import { resolveClientBySlug } from '../../../../../utils/client-resolver'
+import { ok } from '../../../../utils/api-envelope'
+import { buildSignedState, getScopesForService } from '../../../../utils/google-oauth'
+import { resolveClientBySlug } from '../../../../utils/client-resolver'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
