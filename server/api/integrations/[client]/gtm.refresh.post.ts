@@ -1,5 +1,6 @@
 import { useSupabaseServer } from '../../../utils/supabase'
 import { analyzeGTMContainer, fetchGTMContainer } from '../../../utils/gtm-audit'
+import { resolveClientBySlug } from '../../../utils/client-resolver'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -10,14 +11,8 @@ export default defineEventHandler(async (event) => {
   const { client } = getRouterParams(event)
   const clientSlug = String(client || '')
   const supabase = useSupabaseServer(event)
-
-  const { data: clientRow, error: fetchError } = await supabase
-    .from('clients')
-    .select('id, slug, site_name, gtm_account_id, gtm_container_id, gtm_workspace_id')
-    .eq('slug', clientSlug)
-    .maybeSingle()
-
-  if (fetchError || !clientRow) {
+  const clientRow = await resolveClientBySlug(event, clientSlug)
+  if (!clientRow) {
     throw createError({ statusCode: 404, statusMessage: 'Client not found' })
   }
 

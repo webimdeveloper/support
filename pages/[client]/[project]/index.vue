@@ -51,7 +51,7 @@
         </div>
 
         <div
-          v-if="!gtmConfigured"
+          v-if="!gtmConfigured && !gtmError"
           class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200"
         >
           GTM is not configured for this client yet. Add GTM account/container/workspace IDs to the client record first.

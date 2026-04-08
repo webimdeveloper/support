@@ -1,4 +1,4 @@
-import { useSupabaseServer } from '../../../utils/supabase'
+import { resolveClientBySlug } from '../../../utils/client-resolver'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -14,16 +14,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
   }
 
-  const supabase = useSupabaseServer(event)
-  const { data, error } = await supabase
-    .from('clients')
-    .select('slug, site_name, gtm_account_id, gtm_container_id, gtm_workspace_id, gtm_audit_data, gtm_ai_analysis, gtm_last_updated')
-    .eq('slug', clientSlug)
-    .maybeSingle()
-
-  if (error) {
-    throw createError({ statusCode: 500, statusMessage: 'Failed to load GTM integration data' })
-  }
+  const data = await resolveClientBySlug(event, clientSlug)
   if (!data) {
     throw createError({ statusCode: 404, statusMessage: 'Client not found' })
   }
