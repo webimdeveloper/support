@@ -3,26 +3,21 @@ definePageMeta({
   middleware: 'auth',
 })
 
+defineRouteRules({
+  ssr: false,
+})
+
 const route = useRoute()
 const router = useRouter()
 const slug = route.params.client as string
-const { data } = await useFetch('/api/admin/clients')
+const me = await $fetch('/api/auth/me')
+const user = (me as any)?.user
+const defaultProjectSlug = (me as any)?.defaultProjectSlug
 
-const getProjectSlugFromUrl = (siteUrl: string) => {
-  try {
-    const hostname = new URL(siteUrl).hostname.replace(/^www\./, '')
-    return hostname.replace(/\./g, '-')
-  } catch {
-    return slug
-  }
-}
-
-const match = (data.value as any[] | null)?.find((item) => item.slug === slug)
-const projectSlug = match?.site_url ? getProjectSlugFromUrl(match.site_url) : slug
-await router.replace(`/${slug}/${projectSlug}`)
-
-const handleLogout = async () => {
-  await $fetch('/api/auth/logout', { method: 'POST' })
-  await router.push('/login')
+if (user?.role === 'admin') {
+  await router.replace('/admin')
+} else {
+  const projectSlug = defaultProjectSlug || slug
+  await router.replace(`/dashboard/${slug}/${projectSlug}`)
 }
 </script>

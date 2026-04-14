@@ -64,7 +64,7 @@ const handleLogin = async () => {
       window.location.href = '/admin'
     } else if (response?.user?.role === 'client') {
       const projectSlug = response?.user?.projectSlug || form.slug
-      window.location.href = `/${form.slug}/${projectSlug}`
+      window.location.href = `/dashboard/${form.slug}/${projectSlug}`
     }
   } catch (err: any) {
     error.value = err.data?.statusMessage || err.message || 'Login failed.'

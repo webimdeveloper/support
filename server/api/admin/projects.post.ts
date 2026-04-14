@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import { useSupabaseServer } from '../../utils/supabase'
+import { requireAdmin } from '../../utils/auth'
 
 type SaveProjectBody = {
   clientName?: string
@@ -14,13 +15,7 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, '')
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  if (session?.user?.role !== 'admin') {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Admin access required',
-    })
-  }
+  await requireAdmin(event)
 
   const body = await readBody<SaveProjectBody>(event)
   const clientName = body.clientName?.trim()

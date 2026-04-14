@@ -1,17 +1,11 @@
 import { resolveClientBySlug } from '../../../utils/client-resolver'
 import { ok } from '../../../utils/api-envelope'
+import { requireClientScope } from '../../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  const user = session?.user as any
-  if (!user) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
   const { client } = getRouterParams(event)
   const clientSlug = String(client || '')
-  if (user.role !== 'admin' && user.slug !== clientSlug) {
-    throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
-  }
+  await requireClientScope(event, clientSlug)
 
   const clientRow = await resolveClientBySlug(event, clientSlug)
   if (!clientRow) {

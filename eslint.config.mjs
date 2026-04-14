@@ -32,6 +32,7 @@ export default [
       'vue/html-self-closing': 'off',
       'vue/attributes-order': 'off',
       'vue/multi-word-component-names': 'off',
+      'vue/no-v-html': 'off',
     },
   },
 ]

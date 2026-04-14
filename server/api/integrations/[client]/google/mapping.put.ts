@@ -1,6 +1,7 @@
 import { useSupabaseServer } from '../../../../utils/supabase'
 import { resolveClientBySlug } from '../../../../utils/client-resolver'
 import { ok } from '../../../../utils/api-envelope'
+import { requireAdmin } from '../../../../utils/auth'
 
 type MappingBody = {
   gtmAccountId?: string
@@ -11,10 +12,7 @@ type MappingBody = {
 }
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  if (session?.user?.role !== 'admin') {
-    throw createError({ statusCode: 403, statusMessage: 'Admin access required' })
-  }
+  await requireAdmin(event)
   const { client } = getRouterParams(event)
   const clientSlug = String(client || '')
   const body = await readBody<MappingBody>(event)

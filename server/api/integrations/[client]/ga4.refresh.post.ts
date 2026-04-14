@@ -3,12 +3,18 @@ import { resolveClientBySlug } from '../../../utils/client-resolver'
 import { decryptToken } from '../../../utils/token-crypto'
 import { fetchGA4Snapshot } from '../../../utils/google-service-data'
 import { ok } from '../../../utils/api-envelope'
+import { requireAdmin } from '../../../utils/auth'
+import { assertRateLimit } from '../../../utils/rate-limit'
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  if (session?.user?.role !== 'admin') {
-    throw createError({ statusCode: 403, statusMessage: 'Admin access required' })
-  }
+  await requireAdmin(event)
+  const ip = getHeader(event, 'x-forwarded-for') || getHeader(event, 'x-real-ip') || 'unknown'
+  assertRateLimit({
+    key: `ga4-refresh:${ip}`,
+    max: 30,
+    windowMs: 60_000,
+    message: 'Too many GA4 refresh requests. Please try again in one minute.',
+  })
   const { client } = getRouterParams(event)
   const clientSlug = String(client || '')
   const clientRow = await resolveClientBySlug(event, clientSlug)

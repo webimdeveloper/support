@@ -1,4 +1,5 @@
 import { useSupabaseServer } from '../../../utils/supabase'
+import { requireClientScope } from '../../../utils/auth'
 
 const defaultPageTypes = [
   { id: 'lead-gen', label: 'Lead gen', color: '#0F6E56', bgColor: '#E1F5EE' },
@@ -38,18 +39,10 @@ const defaultPages = [
 ]
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  if (!session?.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Not authenticated' })
-  }
-
   const { client, project } = getRouterParams(event)
   const clientSlug = String(client)
   const projectSlug = String(project)
-
-  if (session.user.role === 'client' && session.user.slug !== clientSlug) {
-    throw createError({ statusCode: 403, statusMessage: 'Access denied' })
-  }
+  const user = await requireClientScope(event, clientSlug)
 
   const supabase = useSupabaseServer(event)
   const { data, error } = await supabase
@@ -72,6 +65,6 @@ export default defineEventHandler(async (event) => {
 
   return {
     payload,
-    canEdit: session.user.role === 'admin',
+    canEdit: user.role === 'admin',
   }
 })

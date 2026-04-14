@@ -1,15 +1,10 @@
 import { useSupabaseServer } from '../../utils/supabase'
+import { requireAdmin } from '../../utils/auth'
 
 // GET /api/admin/clients
 // List all clients for admin table
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  if (session?.user?.role !== 'admin') {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Admin access required',
-    })
-  }
+  await requireAdmin(event)
 
   const supabase = useSupabaseServer(event)
   const { data, error } = await supabase

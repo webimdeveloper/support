@@ -6,6 +6,6 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const clientSlug = String(route.params.client || '')
-const projectSlug = String(route.params.project || '')
-await router.replace(`/dashboard/${clientSlug}/${projectSlug}`)
+
+await router.replace(`/${clientSlug}`)
 </script>

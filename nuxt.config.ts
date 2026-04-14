@@ -2,8 +2,23 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   srcDir: '.',
-  ssr: false,
+  ssr: true,
   devtools: { enabled: true },
+  routeRules: {
+    '/': { prerender: true },
+    '/about': { prerender: true },
+    '/privacy': { prerender: true },
+    '/terms': { prerender: true },
+    '/contact': { prerender: true },
+    '/admin/**': { ssr: false },
+    '/dashboard/**': { ssr: false },
+    '/api/**': {
+      cors: true,
+      headers: {
+        'cache-control': 'no-store',
+      },
+    },
+  },
   app: {
     head: {
       meta: [

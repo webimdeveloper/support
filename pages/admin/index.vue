@@ -35,7 +35,12 @@ import AdminHeader from '~/components/features/admin/AdminHeader.vue'
 import type { ClientRow, ClientStatus } from '~/components/features/admin/types'
 
 definePageMeta({
+  layout: 'admin',
   middleware: 'admin',
+})
+
+defineRouteRules({
+  ssr: false,
 })
 
 const router = useRouter()
@@ -154,7 +159,7 @@ const handleProjectClick = async (event: MouseEvent, client: ClientRow) => {
   }
 
   // Use full navigation to avoid edge cases with anchor default behavior.
-  window.location.href = `/${clientSlug}/${projectSlug}`
+  window.location.href = `/dashboard/${clientSlug}/${projectSlug}`
 }
 
 const handleLogout = async () => {
