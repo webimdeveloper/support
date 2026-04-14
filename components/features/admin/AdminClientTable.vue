@@ -8,6 +8,7 @@
           </th>
           <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Client</th>
           <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Project</th>
+          <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Services</th>
           <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Status</th>
           <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Created</th>
         </tr>
@@ -56,6 +57,12 @@
             </UiLink>
           </td>
           <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+            <AdminClientServices
+              :services="client.services"
+              @update-mode="(payload) => $emit('update-service-mode', client, payload)"
+            />
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
             <UiBadge :tone="statusTone[client.status]">
               {{ client.status }}
             </UiBadge>
@@ -69,11 +76,13 @@
 
 <script setup lang="ts">
 import type { ClientRow, ClientStatus } from './types'
+import AdminClientServices from './AdminClientServices.vue'
 
 defineEmits<{
   (e: 'save-project', client: ClientRow): void
   (e: 'project-click', event: MouseEvent, client: ClientRow): void
   (e: 'enable-project-edit', client: ClientRow): void
+  (e: 'update-service-mode', client: ClientRow, payload: { service: 'gtm' | 'ga4' | 'gsc'; managementMode: 'admin_managed' | 'client_self_service' }): void
 }>()
 
 defineProps<{

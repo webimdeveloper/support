@@ -17,6 +17,7 @@
       @save-project="saveProject"
       @project-click="handleProjectClick"
       @enable-project-edit="enableProjectEdit"
+      @update-service-mode="updateServiceMode"
     />
     <datalist id="client-suggestions">
       <option
@@ -32,7 +33,7 @@
 <script setup lang="ts">
 import AdminClientTable from '~/components/features/admin/AdminClientTable.vue'
 import AdminHeader from '~/components/features/admin/AdminHeader.vue'
-import type { ClientRow, ClientStatus } from '~/components/features/admin/types'
+import type { ClientRow, ClientStatus, ServiceManagementMode, ServiceKey } from '~/components/features/admin/types'
 
 definePageMeta({
   layout: 'admin',
@@ -84,6 +85,14 @@ const mapClientFromApi = (client: any): ClientRow => ({
   isProjectEditing: false,
   clientInput: String(client.site_name ?? ''),
   projectInput: String(client.site_url ?? ''),
+  services: Array.isArray(client.services)
+    ? client.services.map((service: any) => ({
+      key: service.key,
+      configured: Boolean(service.configured),
+      connected: Boolean(service.connected),
+      managementMode: service.managementMode === 'admin_managed' ? 'admin_managed' : 'client_self_service',
+    }))
+    : [],
 })
 
 const existingClientNames = computed(() =>
@@ -104,6 +113,7 @@ const handleAddClient = () => {
     isProjectEditing: true,
     clientInput: '',
     projectInput: '',
+    services: [],
   })
 }
 
@@ -165,6 +175,26 @@ const handleProjectClick = async (event: MouseEvent, client: ClientRow) => {
 const handleLogout = async () => {
   await $fetch('/api/auth/logout', { method: 'POST' })
   await router.push('/login')
+}
+
+const updateServiceMode = async (
+  client: ClientRow,
+  payload: { service: ServiceKey; managementMode: ServiceManagementMode }
+) => {
+  saveError.value = ''
+  try {
+    await $fetch(`/api/admin/clients/${client.id}/services`, {
+      method: 'PUT',
+      body: payload,
+    })
+    client.services = client.services.map((item) =>
+      item.key === payload.service
+        ? { ...item, managementMode: payload.managementMode }
+        : item
+    )
+  } catch (error: any) {
+    saveError.value = error?.data?.statusMessage || 'Failed to update service mode'
+  }
 }
 
 onMounted(async () => {
