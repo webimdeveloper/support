@@ -103,10 +103,6 @@ definePageMeta({
   middleware: 'auth',
 })
 
-defineRouteRules({
-  ssr: false,
-})
-
 const route = useRoute()
 const router = useRouter()
 const clientSlug = computed(() => String(route.params.client || ''))

@@ -40,10 +40,6 @@ definePageMeta({
   middleware: 'admin',
 })
 
-defineRouteRules({
-  ssr: false,
-})
-
 const router = useRouter()
 
 const statusTone: Record<ClientStatus, 'success' | 'info' | 'neutral'> = {
