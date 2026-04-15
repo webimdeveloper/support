@@ -14,24 +14,41 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav class="flex space-x-8" aria-label="Tabs">
           <button
-            v-for="tab in tabs"
-            :key="tab"
-            @click="activeTab = tab"
+            v-for="module in visibleModules"
+            :key="module.id"
+            @click="activeModuleId = module.id"
             :class="[
-              activeTab === tab
+              activeModuleId === module.id
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600',
               'py-4 px-1 border-b-2 font-medium text-sm',
             ]"
           >
-            {{ tab }}
+            {{ module.label }}
           </button>
         </nav>
       </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div v-if="activeTab === 'CRO'" class="space-y-6">
+      <div v-if="serviceManifest.loading" class="rounded-md border border-gray-200 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">
+        Loading service modules...
+      </div>
+      <div v-else-if="serviceManifest.error" class="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+        {{ serviceManifest.error }}
+      </div>
+      <div
+        v-else-if="disabledModules.length > 0"
+        class="mb-6 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300"
+      >
+        <p class="font-medium">Some modules are disabled</p>
+        <ul class="mt-2 space-y-1">
+          <li v-for="module in disabledModules" :key="module.id">
+            {{ module.label }}: {{ module.reason || 'Disabled by configuration' }}
+          </li>
+        </ul>
+      </div>
+      <div v-if="!serviceManifest.loading && !serviceManifest.error && activeModuleId === 'cro'" class="space-y-6">
         <LazyClientDashboardTabCRO
           :pages="dashboard.pages"
           :page-types="dashboard.pageTypes"
@@ -43,7 +60,7 @@
         <p v-if="saveMessage" class="text-sm text-green-600">{{ saveMessage }}</p>
       </div>
       <LazySiteHealthPanel
-        v-else-if="activeTab === 'Site Health'"
+        v-else-if="!serviceManifest.loading && !serviceManifest.error && activeModuleId === 'site-health'"
         :is-admin="isAdmin"
         :loading="gtm.loading.value"
         :connecting="gtm.connecting.value"
@@ -64,8 +81,11 @@
         @save-mapping="(value) => { gtm.ids.value = value; gtm.saveMapping() }"
         @filter="gtm.setSeverityFilter"
       />
-      <div v-else class="text-center py-12">
-        <p class="text-gray-500 dark:text-gray-400 text-lg">{{ activeTab }} tab - Coming soon</p>
+      <div v-else-if="!serviceManifest.loading && !serviceManifest.error" class="text-center py-12">
+        <p class="text-gray-500 dark:text-gray-400 text-lg">
+          {{ activeModule?.label || 'Module' }} is not available.
+        </p>
+        <p v-if="activeModule?.reason" class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ activeModule.reason }}</p>
       </div>
       <div class="mt-6" v-if="isAdmin">
         <UiButton variant="secondary" @click="goBackToAdmin">Back to Admin</UiButton>
@@ -79,6 +99,8 @@
 </template>
 
 <script setup lang="ts">
+import type { ServiceModuleManifestItem } from '~/types/services'
+
 type PageType = { id: string; label: string; color: string; bgColor: string }
 type UserType = { id: string; label: string; color: string }
 type FunnelStage = { id: string; label: string; color: string }
@@ -107,8 +129,7 @@ const route = useRoute()
 const router = useRouter()
 const clientSlug = computed(() => String(route.params.client || ''))
 const projectSlug = computed(() => String(route.params.project || ''))
-const activeTab = ref('CRO')
-const tabs = ['CRO', 'Site Health', 'Assets', 'Reports']
+const activeModuleId = ref<string>('')
 const isAdmin = ref(false)
 const loadError = ref('')
 const saveMessage = ref('')
@@ -160,6 +181,15 @@ const loadDashboard = async () => {
 }
 
 const gtm = useGtmInsights(clientSlug, isAdmin)
+const serviceManifest = useServiceManifest(clientSlug)
+
+const visibleModules = computed(() => serviceManifest.modules.value.filter((module) => module.enabled))
+const disabledModules = computed(() => serviceManifest.modules.value.filter((module) => !module.enabled))
+
+const activeModule = computed<ServiceModuleManifestItem | null>(() => {
+  const match = serviceManifest.modules.value.find((module) => module.id === activeModuleId.value)
+  return match || null
+})
 
 const saveDashboard = async (payload: DashboardPayload) => {
   if (!isAdmin.value) return
@@ -176,7 +206,13 @@ const saveDashboard = async (payload: DashboardPayload) => {
 }
 
 onMounted(async () => {
+  await serviceManifest.load()
+  if (visibleModules.value.length > 0) {
+    activeModuleId.value = visibleModules.value[0].id
+  }
   await loadDashboard()
-  await gtm.load()
+  if (visibleModules.value.some((module) => module.id === 'site-health')) {
+    await gtm.load()
+  }
 })
 </script>

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const supabase = useSupabaseServer(event)
   const { data, error } = await supabase
     .from('clients')
-    .select('id, slug, site_name, site_url, active, created_at, gtm_account_id, gtm_container_id, gtm_workspace_id, ga4_property_id, gsc_site_url, google_refresh_token_enc, google_token_connected_at')
+    .select('id, slug, site_name, site_url, active, created_at, gtm_account_id, gtm_container_id, gtm_workspace_id, ga4_property_id, gsc_site_url, google_refresh_token_enc, google_token_connected_at, google_services_state')
     .order('created_at', { ascending: false })
 
   if (error) {
